@@ -14,6 +14,18 @@ export interface RequestInit<A extends DA = DA> extends UndiciRequestInit {
   attributes?: Readonly<Partial<A>>;
 }
 
+const resolveAttributes = <A extends DA>(input: RequestInfo<A>, init?: RequestInit<A>): Readonly<Partial<A>> => {
+  if (init?.attributes) {
+    return { ...init.attributes };
+  }
+
+  if (input instanceof ServerRequest) {
+    return { ...input.attributes } as Partial<A>;
+  }
+
+  return {} as Partial<A>;
+};
+
 export class ServerRequest<A extends DA = DA> extends UndiciRequest {
   readonly attributes: Readonly<Partial<A>>;
   readonly clone: () => ServerRequest<A>;
@@ -22,13 +34,7 @@ export class ServerRequest<A extends DA = DA> extends UndiciRequest {
     super(input, init);
 
     // oxlint-disable-next-line functional/immutable-data
-    this.attributes = (
-      init?.attributes
-        ? { ...init.attributes }
-        : input instanceof ServerRequest
-          ? ({ ...input.attributes } as Partial<A>)
-          : {}
-    ) as Readonly<Partial<A>>;
+    this.attributes = resolveAttributes(input, init);
 
     // oxlint-disable-next-line functional/immutable-data
     this.clone = () => new ServerRequest<A>(this);

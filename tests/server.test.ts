@@ -1,4 +1,6 @@
+import { Request as UndiciRequest } from 'undici';
 import { describe, expect, test } from 'vitest';
+import type { RequestInfo } from '../src/server.js';
 import { pipe, Response, ServerRequest } from '../src/server.js';
 
 describe('server', () => {
@@ -113,6 +115,33 @@ describe('server', () => {
           "attributeName": "attributeValue",
         }
       `);
+    });
+
+    test('with with URL', async () => {
+      const url = new URL('https://example.com');
+
+      const serverRequest = new ServerRequest(url);
+
+      expect(serverRequest.method).toBe('GET');
+      expect(serverRequest.url).toBe('https://example.com/');
+      expect([...serverRequest.headers.entries()]).toMatchInlineSnapshot('[]');
+      expect(await serverRequest.text()).toBe('');
+      expect(serverRequest.attributes).toMatchInlineSnapshot('{}');
+    });
+
+    test('with request, which is not a server request, but with attributes', async () => {
+      // oxlint-disable-next-line functional/immutable-data
+      const request: RequestInfo = Object.assign(new UndiciRequest('https://example.com'), {
+        attributes: { attributeName: 'attributeValue' },
+      });
+
+      const serverRequest = new ServerRequest(request);
+
+      expect(serverRequest.method).toBe('GET');
+      expect(serverRequest.url).toBe('https://example.com/');
+      expect([...serverRequest.headers.entries()]).toMatchInlineSnapshot('[]');
+      expect(await serverRequest.text()).toBe('');
+      expect(serverRequest.attributes).toMatchInlineSnapshot('{}');
     });
 
     test('clone', async () => {
