@@ -10,34 +10,33 @@ type DA = Record<string, unknown>;
 
 export type RequestInfo<A extends DA = DA> = string | URL | UndiciRequest | ServerRequest<A>;
 
-export interface RequestInit<A extends DA = DA> extends UndiciRequestInit {
-  attributes?: Readonly<Partial<A>>;
+export interface RequestInit<A extends DA = DA, IA extends DA = A> extends UndiciRequestInit {
+  attributes?: Readonly<Partial<A> & Partial<Record<keyof NoInfer<IA>, unknown>>>;
 }
 
-const resolveAttributes = <A extends DA>(input: RequestInfo<A>, init?: RequestInit<A>): Readonly<Partial<A>> => {
-  if (init?.attributes) {
-    return { ...init.attributes };
-  }
+type MergedAttributes<IA extends DA, A extends DA> = Readonly<Partial<Omit<IA, Extract<keyof A, keyof IA>> & A>>;
 
-  if (input instanceof ServerRequest) {
-    return { ...input.attributes } as Partial<A>;
-  }
+const resolveAttributes = <A extends DA, IA extends DA>(
+  input: RequestInfo<IA>,
+  init?: RequestInit<A, IA>,
+): MergedAttributes<IA, A> => {
+  const inputAttributes = input instanceof ServerRequest ? input.attributes : {};
 
-  return {} as Partial<A>;
+  return { ...inputAttributes, ...init?.attributes } as MergedAttributes<IA, A>;
 };
 
-export class ServerRequest<A extends DA = DA> extends UndiciRequest {
-  readonly attributes: Readonly<Partial<A>>;
-  readonly clone: () => ServerRequest<A>;
+export class ServerRequest<A extends DA = DA, IA extends DA = A> extends UndiciRequest {
+  readonly attributes: MergedAttributes<IA, A>;
+  readonly clone: () => ServerRequest<A, IA>;
 
-  constructor(input: RequestInfo<A>, init?: RequestInit<A>) {
+  constructor(input: RequestInfo<IA>, init?: RequestInit<A, IA>) {
     super(input, init);
 
     // oxlint-disable-next-line functional/immutable-data
     this.attributes = resolveAttributes(input, init);
 
     // oxlint-disable-next-line functional/immutable-data
-    this.clone = () => new ServerRequest<A>(this);
+    this.clone = () => new ServerRequest<A, IA>(this as unknown as ServerRequest<IA>);
   }
 }
 

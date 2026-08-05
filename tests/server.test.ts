@@ -117,6 +117,25 @@ describe('server', () => {
       `);
     });
 
+    test('with request, with attributes on inner request and on init', async () => {
+      const serverRequest = new ServerRequest(
+        new ServerRequest('https://example.com', {
+          attributes: { user: 'john.doe', shared: 'inner' },
+        }),
+        {
+          attributes: { logId: 1, shared: 'outer' },
+        },
+      );
+
+      expect(serverRequest.attributes).toMatchInlineSnapshot(`
+        {
+          "logId": 1,
+          "shared": "outer",
+          "user": "john.doe",
+        }
+      `);
+    });
+
     test('with with URL', async () => {
       const url = new URL('https://example.com');
 

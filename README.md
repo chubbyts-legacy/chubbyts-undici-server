@@ -24,14 +24,14 @@ Use undici within a server framework.
 ## Requirements
 
  * node: 22
- * [undici][2]: ^8.2.0
+ * [undici][2]: ^8.10.0
 
 ## Installation
 
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-undici-server][1].
 
 ```sh
-npm i @chubbyts/chubbyts-undici-server@^1.2.0
+npm i @chubbyts/chubbyts-undici-server@^1.3.0
 ```
 
 ## Usage
