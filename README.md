@@ -17,6 +17,8 @@
 [![sqale_index](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-undici-server&metric=sqale_index)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-undici-server)
 [![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-undici-server&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-undici-server)
 
+**Deprecated: @chubbyts/chubbyts-undici-server is no longer maintained, use [@chubbyts/chubbyts-http-types](https://github.com/chubbyts/chubbyts-http-types) (types) and [@chubbyts/chubbyts-http](https://github.com/chubbyts/chubbyts-http) (implementation) instead.**
+
 ## Description
 
 Use undici within a server framework.
